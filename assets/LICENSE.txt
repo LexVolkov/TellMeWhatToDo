@@ -1,0 +1,14 @@
+Графічні ассети (не код проєкту)
+
+1) Персонаж
+   Top-Down Character Animations — Eduardo Scarpato / Dagon Dev
+   https://eduardscarpato.itch.io/top-down-character
+   Ліцензія: CC0 (вільно для особистого й комерційного використання)
+
+2) Оточення (острів)
+   Survival Kit [Pixel Art 16x16] — Eduardo Scarpato / Dagon Dev
+   https://eduardscarpato.itch.io/survival-kit-pixel-art-16x16-dagon
+   У репо: FREE-версія; вільно для особистого й комерційного використання
+   (не перерозповсюджувати як окремий asset pack, якщо ліцензія автора це забороняє — перевірити сторінку itch)
+
+Кредити автору бажані, для CC0-персонажа не обов’язкові.

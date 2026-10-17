@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8"><title>Tell Me What To Do</title>
+<style>
+html,body{margin:0;height:100%;background:#0d0a10;color:#eee;font-family:sans-serif;overflow:hidden}
+#app{display:flex;height:100%}
+.panel{width:300px;flex:none;background:#17121c;display:flex;flex-direction:column;padding:10px;box-sizing:border-box;gap:8px;overflow-y:auto}
+#left{border-right:2px solid #2c2233}#right{border-left:2px solid #2c2233}
+#stage{flex:1;position:relative;min-width:0}
+#view{width:100%;height:100%;display:block;image-rendering:pixelated;cursor:grab}
+h3{margin:0;font-size:14px;color:#c9b6d8}
+#hp{font-size:18px;color:#e66}
+.bar{height:6px;background:#300;margin-top:3px}.bar i{display:block;height:100%;background:#e33}
+#stats{font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}#stats span{color:#999}
+.lbl{font-size:12px;color:#aaa;margin-bottom:3px}
+.grid{display:grid;gap:3px;grid-template-columns:repeat(3,40px)}
+.cell{width:40px;height:40px;background:url('assets/items/slot.png') 0 0/100% 100%;image-rendering:pixelated}
+.cell.full{cursor:help}.cell.full:hover{filter:brightness(1.4)}
+.cell img{width:32px;height:32px;margin:4px;image-rendering:pixelated;pointer-events:none}
+#itemInfo{display:flex;gap:8px;font-size:12px;background:#0f0b13;border:1px solid #4a3a55;padding:6px}#itemInfo[hidden]{display:none}#itemInfo img{width:32px;height:32px;image-rendering:pixelated}#itemInfo span{color:#aaa}
+#state{align-self:center;font-size:14px;font-weight:bold}#state.run{color:#6e6}#state.pause{color:#fc6}
+#inv{font-size:16px}
+#rooms,#goal,#cost{font-size:13px;color:#bbb}
+#log{flex:1;min-height:120px;overflow-y:auto;font-size:12px;background:#0f0b13;border:1px solid #2c2233;padding:6px}
+.entry{border-bottom:1px solid #241c2a;padding:4px 0;line-height:1.35}
+.entry .t{color:#777}.entry.err{color:#f88}.entry.refuse{color:#fc6}.entry.ask{color:#8cf}.entry.auto{color:#9e9}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+button{background:#2c2233;color:#eee;border:1px solid #4a3a55;padding:6px 8px;cursor:pointer;border-radius:4px}
+button:hover{background:#3a2d44}
+.btnlink{display:inline-block;align-self:flex-start;background:#2c2233;color:#eee;border:1px solid #4a3a55;padding:6px 10px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:13px}
+.langrow{display:flex;align-items:center;gap:6px}.langbtn{display:inline-flex;align-items:center;gap:5px}.langbtn svg{border-radius:2px}.langbtn.active{border-color:#c9a0ff;background:#3a2d44}
+.btnlink:hover{background:#3a2d44;border-color:#6a5478}
+input[type=password],select{padding:5px;background:#0f0b13;color:#eee;border:1px solid #4a3a55;width:100%;box-sizing:border-box}
+label{font-size:13px}small{color:#999;font-size:11px}
+#hint{font-size:11px;color:#aaa;line-height:1.5}
+#status{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:16px;color:#aaa;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:12px}
+#status.on{color:#f55}
+#text{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);font-size:34px;max-width:80%;text-align:center;text-shadow:0 2px 6px #000;background:rgba(0,0,0,.45);padding:6px 16px;border-radius:10px;min-height:1.2em}
+#text:empty{display:none}
+#interim{color:#999}
+#thinking{position:absolute;top:48px;left:50%;transform:translateX(-50%);color:#8cf;font-size:14px}
+.modal{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:5}
+.modal[hidden]{display:none}
+.card{background:#1d1724;border:1px solid #4a3a55;padding:20px;border-radius:8px;width:360px;display:flex;flex-direction:column;gap:10px}
+</style></head><body>
+<div id="app">
+  <div id="left" class="panel">
+    <h3 data-i18n="ui.settings"></h3>
+    <label><span data-i18n="ui.keyLabel"></span><input id="keyInput" type="password" placeholder="jv_live_..."></label>
+<a class="btnlink" href="https://console.typesafe.ai/keys" target="_blank" rel="noopener" data-i18n="ui.keyBtn" data-i18n-title="ui.keyTip"></a>
+    <small data-i18n="ui.keyNote"></small>
+    <label><input id="proxyChk" type="checkbox"> <span data-i18n="ui.proxy"></span></label>
+    <div class="langrow"><button class="langbtn" data-lang="uk" title="Українська"><svg width="20" height="14" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="1" fill="#0057b7"/><rect y="1" width="3" height="1" fill="#ffd700"/></svg> UKR</button><button class="langbtn" data-lang="en" title="English"><svg width="20" height="14" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="gbc"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath><path d="M0,0v30h60v-30z" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0L60,30M60,0L0,30" clip-path="url(#gbc)" stroke="#C8102E" stroke-width="4"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg> ENG</button></div>
+    <div class="btns"><button id="btnSfx"></button><button id="btnMusic"></button></div>
+    <div class="btns"><button id="btnRun"></button><span id="state" class="pause"></span></div>
+    <div class="btns"><button id="btnNew" data-i18n="ui.newMaze"></button></div>
+    <div id="hint" data-i18n="ui.hint"></div>
+    <div id="cost"></div>
+    <h3 data-i18n="ui.log"></h3>
+    <div id="log"></div>
+  </div>
+  <div id="stage">
+    <canvas id="view"></canvas>
+    <div id="status"></div>
+    <div id="thinking" hidden data-i18n="ui.thinking"></div>
+    <div id="text"><span id="final"></span><span id="interim"></span></div>
+    <div id="end" class="modal" hidden><div class="card"><h2 id="endText"></h2><button id="btnAgain" data-i18n="ui.again"></button></div></div>
+  </div>
+  <div id="right" class="panel">
+    <h3 data-i18n="ui.hero"></h3>
+    <div id="hp"></div><div id="stats"></div>
+    <div><div class="lbl" data-i18n="ui.equip"></div><div id="equip" class="grid"></div></div>
+    <div><div class="lbl" data-i18n="ui.backpack"></div><div id="invgrid" class="grid"></div></div>
+    <div id="inv"></div>
+    <div id="itemInfo" hidden></div>
+    <div id="rooms"></div><div id="goal"></div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body></html>

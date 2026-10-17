@@ -1,0 +1,9 @@
+node_modules/
+tools/last-jev.json
+tools/*-preview.png
+tools/preview-rooms.png
+tools/_*.mjs
+tools/_*.out
+*.log
+.DS_Store
+Thumbs.db
